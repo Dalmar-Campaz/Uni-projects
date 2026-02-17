@@ -69,5 +69,10 @@ public class Estudiante {
         this.edad = edad;
     }
 
+    @Override
+    public String toString() {
+        return "Estudiante [nombre=" + nombre + ", semestre=" + semestre + ", programa=" + programa + ", notaPromedio="
+                + notaPromedio + ", edad=" + edad + "]";
+    }
     
 }

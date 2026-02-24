@@ -21,16 +21,27 @@ public class ejercicio2 {
         est[14] = new Estudiante("Pedro", 3, "Leyes", 4.3, 19);
         est[15] = new Estudiante("Oscar", 9, "Ingenieria Automotriz", 3.5, 22);
         est[16] = new Estudiante("Sofia", 1, "Pedagogia Infantil", 4.5, 20);
-        // nota promedio de los estudiantes de 3ro
+        //taller de programacion
+        String programa = "ingenieria en sistemas";
+        int semestre = 3;
+        double promedio = sorter(semestre, programa, est);
+        System.out.println(
+            "Programa: "+programa+
+            "\nSemestre: "+semestre+
+            "\nPromedio de los estudiantes: "+(promedio == -1 ? "No hay estudiantes en ese programa y semestre" : promedio));
 
-        double sorter(int semestre, String programa){
-        double notas = 0.0;
-        for (int i = 0; i < est.length; i++) {
-            if (est[i].getSemestre() == 3) {
-                notas += est[i].getNotaPromedio();
+    }
+
+    public static double sorter(int semestre, String programa, Estudiante[] est){
+        double promedio = 0.0;
+        int cuenta = 0;
+        for(int i = 0; i < est.length; i++){
+            if(est[i].getSemestre() == semestre && est[i].getPrograma().toLowerCase().equals(programa.toLowerCase())){
+                promedio += est[i].getNotaPromedio();
+                cuenta++;
             }
         }
-        }
-
+        if(cuenta != 0) return promedio / cuenta;
+        else return -1;
     }
 }

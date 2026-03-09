@@ -80,7 +80,7 @@ public class Main1 {
                 int idBuque2 = sc.nextInt();
                 for (int i = 0; i < buques.length; i++) {
                     if (buques[i] != null && buques[i].id == idBuque2) {
-                        int pesoTotal = 0;
+                        double pesoTotal = 0;
                         for (int j = 0; j < buques[i].contenedores.length; j++) {
                             for (int k = 0; k < buques[i].contenedores[0].length; k++) {
                                 if (buques[i].contenedores[j][k] != null) {
@@ -88,12 +88,34 @@ public class Main1 {
                                 }
                             }
                         }
-                        System.out.println("El peso total de los contenedores del buque con el id " + idBuque2 + " es: " + pesoTotal);
+                        System.out.println("El peso total de los contenedores del buque con id " + idBuque2 + " es: " + pesoTotal);
+                        break;
+                    }else {
+                        System.out.println("No se encontro el buque con el id " + idBuque2);
                         break;
                     }
                 }
                 break;
             case 4:
+                System.out.println("Ingrese el id del buque del que desea listar los orígenes de los contenedores: ");
+                int idBuque3 = sc.nextInt();
+                String [] origenes;
+                for (int i = 0; i < buques.length; i++) {
+                    if (buques[i] != null && buques[i].id == idBuque3) {
+                        System.out.println("Orígenes de los contenedores del buque con id " + idBuque3 + ":");
+                        for (int j = 0; j < buques[i].contenedores.length; j++) {
+                            for (int k = 0; k < buques[i].contenedores[0].length; k++) {
+                                if (buques[i].contenedores[j][k] != null) {
+                                    System.out.println("- " + buques[i].contenedores[j][k].origen);
+                                }
+                            }
+                        }
+                        break;
+                    }else {
+                        System.out.println("No se encontro el buque con el id " + idBuque3);
+                        break;
+                    }
+                }
 
                 break;
             case 5:

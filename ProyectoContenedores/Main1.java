@@ -99,14 +99,14 @@ public class Main1 {
             case 4:
                 System.out.println("Ingrese el id del buque del que desea listar los orígenes de los contenedores: ");
                 int idBuque3 = sc.nextInt();
-                String [] origenes;
+                ArrayList<String> origenes = new ArrayList<>();
                 for (int i = 0; i < buques.length; i++) {
                     if (buques[i] != null && buques[i].id == idBuque3) {
-                        System.out.println("Orígenes de los contenedores del buque con id " + idBuque3 + ":");
                         for (int j = 0; j < buques[i].contenedores.length; j++) {
                             for (int k = 0; k < buques[i].contenedores[0].length; k++) {
-                                if (buques[i].contenedores[j][k] != null) {
-                                    System.out.println("- " + buques[i].contenedores[j][k].origen);
+                                String origen = buques[i].contenedores[j][k] != null ? buques[i].contenedores[j][k].origen : null;  
+                                if (origen != null && !origenes.contains(origen)) {
+                                    origenes.add(origen);
                                 }
                             }
                         }

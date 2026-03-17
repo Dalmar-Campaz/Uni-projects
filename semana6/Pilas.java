@@ -9,7 +9,7 @@ public class Pilas {
         pila.push("Gyasi");
         pila.push("Campaz");
         pila.push("Vidal");
-        pila.push("Vidal");
+        pila.push("gonzalez");
 
         System.out.println("Pila: " + pila);
         System.out.println("Elemento superior: " + pila.peek());

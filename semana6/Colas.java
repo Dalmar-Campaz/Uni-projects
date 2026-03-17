@@ -7,7 +7,7 @@ public class Colas {
     public static void main(String[] args) {
         Queue<Integer> cola = new ArrayDeque<>();
         cola.add(32);
-        cola.add(24);
+        cola.add(22);
         cola.add(35);
         cola.add(46);
         cola.add(57);
@@ -16,7 +16,7 @@ public class Colas {
         cola.add(84);
         cola.add(99);
 
-        // mostrar la cola
+/*         // mostrar la cola
         System.out.println(cola);
 
         // verificar el primer elemento de la cola
@@ -40,7 +40,24 @@ public class Colas {
         // mostrar la cola
         System.out.println(cola);
 
-        //obtener tamaño de la cola
-        System.out.println("\nTamaño de la cola: " + cola.size());
+        // obtener tamaño de la cola
+        System.out.println("\nTamaño de la cola: " + cola.size()); */
+
+        // Activity
+        System.out.println("\nActividad:");
+
+        System.out.println(cola);
+        //remove and contains
+        if (cola.contains(22)) {
+            cola.remove(22);
+        }
+        System.out.println("cola sin el 22: " + cola);
+
+        // clear
+        cola.clear();
+
+        // isEmpty
+        if (cola.isEmpty())
+            System.out.println("La cola está vacía");
     }
 }

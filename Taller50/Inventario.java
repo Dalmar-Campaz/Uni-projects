@@ -1,3 +1,5 @@
+package Taller50;
+
 public class Inventario {
     private Producto[] productos;
     private int cantidadProductos;

@@ -1,3 +1,5 @@
+package Taller50;
+
 public class Producto {
     private int cantidadStock;
     private int id;

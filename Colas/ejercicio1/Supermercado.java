@@ -1,4 +1,4 @@
-package Colas;
+package Colas.ejercicio1;
 
 import java.util.ArrayDeque;
 import java.util.Queue;

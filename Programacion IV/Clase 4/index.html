@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda - Ejercicio de clase</title>
+  <link rel="stylesheet" href="./css/estilos.css">
+</head>
+<body>
+
+  <header>
+    <h1>Tienda Online</h1>
+  </header>
+
+  <main>
+    <section id="productos" class="productos">
+      <!-- Acá el JS va a inyectar las tarjetas con el forEach -->
+    </section>
+
+    <aside id="carrito" class="carrito">
+      <h2>Carrito</h2>
+      <div id="items-carrito">
+        <!-- Acá se van a pintar los productos agregados -->
+      </div>
+      <p class="total">Total: $<span id="total-carrito">0</span></p>
+    </aside>
+  </main>
+
+  <script src="./js/productos.js"></script>
+  <script src="./js/script.js"></script>
+</body>
+</html>

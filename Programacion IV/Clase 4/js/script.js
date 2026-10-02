@@ -39,3 +39,15 @@ productos.forEach((producto) => {
 
     contenedorProductos.appendChild(tarjeta);
 })
+
+function agregarAlCarrito(id) {
+  const producto = productos.find((producto) => producto.id === id);
+  if (producto) {
+    carrito.push(producto);
+    actualizarCarrito();
+  }
+}
+
+function actualizarCarrito() {
+    
+}

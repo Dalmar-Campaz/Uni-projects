@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Char App</title>
+    <link rel="stylesheet" href="./css/estilos.css">
+</head>
+
+<body>
+ 
+  <header>
+    <h1>Galería de Personajes</h1>
+  </header>
+ 
+  <main>
+    <!-- Visor grande: muestra el personaje seleccionado -->
+    <section id="visor">
+      <button id="btn-anterior" class="flecha" aria-label="Anterior">‹</button>
+ 
+      <div class="visor-contenido">
+        <img id="visor-imagen" src="" alt="">
+        <h2 id="visor-nombre"></h2>
+        <p id="visor-franquicia"></p>
+        <span id="visor-categoria" class="etiqueta"></span>
+        <p id="visor-descripcion"></p>
+      </div>
+ 
+      <button id="btn-siguiente" class="flecha" aria-label="Siguiente">›</button>
+    </section>
+ 
+    <!-- Galería de tarjetas chicas -->
+    <section id="galeria" class="galeria">
+      <!-- Acá el forEach pinta las tarjetas -->
+    </section>
+  </main>
+    
+  <script src="./js/char.js"></script>
+  <script src="./js/script_tarea.js"></script>
+  
+</body>
+</html>
+
+    

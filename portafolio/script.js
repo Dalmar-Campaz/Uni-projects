@@ -1,7 +1,7 @@
 'use strict';
 
 /* ---------- Datos: edita aquí tus talleres ---------- */
-const GITHUB = 'https://github.com/TU_USUARIO';
+const GITHUB = 'https://github.com/Dalmar-Campaz';
 const trabajos = [
   { n: '01', tipo: 'taller',   estado: 'completado', titulo: 'Taller 1 – Fundamentos de JavaScript',
     desc: 'Variables, condicionales y ciclos para resolver ejercicios básicos de lógica en el navegador.', tech: ['JavaScript'], repo: 'taller-1' },

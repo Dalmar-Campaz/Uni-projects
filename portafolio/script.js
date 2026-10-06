@@ -1,24 +1,10 @@
 'use strict';
 
 /* ---------- Datos: edita aquí tus talleres ---------- */
-const GITHUB = 'https://github.com/Dalmar-Campaz';
+const GITHUB = 'https://github.com/Dalmar-Campaz/Uni-projects/tree/main/Programacion%20IV/Taller%20';
 const trabajos = [
   { n: '01', tipo: 'taller',   estado: 'completado', titulo: 'Taller 1 – Fundamentos de JavaScript',
-    desc: 'Variables, condicionales y ciclos para resolver ejercicios básicos de lógica en el navegador.', tech: ['JavaScript'], repo: 'taller-1' },
-  { n: '02', tipo: 'taller',   estado: 'completado', titulo: 'Taller 2 – Arreglos y funciones',
-    desc: 'Funciones que buscan, ordenan y calculan estadísticas sobre arreglos de números.', tech: ['JavaScript'], repo: 'taller-2' },
-  { n: '03', tipo: 'taller',   estado: 'completado', titulo: 'Taller 3 – Manipulación del DOM',
-    desc: 'Creación y modificación de elementos de la página desde JavaScript.', tech: ['JavaScript', 'HTML/CSS'], repo: 'taller-3' },
-  { n: '04', tipo: 'taller',   estado: 'proceso',    titulo: 'Taller 4 – Eventos y formularios',
-    desc: 'Validación de formularios y respuesta a las acciones del usuario.', tech: ['JavaScript', 'HTML/CSS'], repo: 'taller-4' },
-  { n: '05', tipo: 'taller',   estado: 'pendiente',  titulo: 'Taller 5 – Diseño responsive',
-    desc: 'Maquetación adaptable con Flexbox, Grid y media queries.', tech: ['HTML/CSS'], repo: 'taller-5' },
-  { n: '06', tipo: 'taller',   estado: 'pendiente',  titulo: 'Taller 6 – Almacenamiento local',
-    desc: 'Guardar y recuperar datos del usuario con localStorage.', tech: ['JavaScript'], repo: 'taller-6' },
-  { n: '07', tipo: 'taller',   estado: 'pendiente',  titulo: 'Taller 7 – Consumo de una API',
-    desc: 'Peticiones con fetch y presentación de los datos recibidos.', tech: ['JavaScript', 'HTML/CSS'], repo: 'taller-7' },
-  { n: '08', tipo: 'proyecto', estado: 'pendiente',  titulo: 'Proyecto final – Sitio web',
-    desc: 'Sitio web completo que integra maquetación, estilos e interactividad.', tech: ['JavaScript', 'HTML/CSS'], repo: 'proyecto-final' }
+    desc: 'Variables, condicionales y ciclos para resolver ejercicios básicos de lógica en el navegador.', tech: ['JavaScript'], numero: '1' },
 ];
 
 const ETIQUETA = { completado: 'Completado', proceso: 'En proceso', pendiente: 'Pendiente' };
@@ -43,7 +29,7 @@ function crearTarjeta(t, i) {
     <p class="muted">${t.desc}</p>
     <ul class="tags">${t.tech.map(x => `<li>${x}</li>`).join('')}</ul>
     <div class="card-links">
-      <a href="${GITHUB}/${t.repo}" target="_blank" rel="noopener noreferrer">${ICONO_CODIGO}Ver código</a>
+      <a href="${GITHUB}${t.numero}" target="_blank" rel="noopener noreferrer">${ICONO_CODIGO}Ver código</a>
       <a href="${t.repo}/index.html">${ICONO_PAGINA}Ver página</a>
     </div>`;
   return el;

@@ -299,11 +299,15 @@ h2 {
   background: var(--pen-bg);
   color: var(--pen-tx);
 }
-.thumb {
+.thumb, .thumbnail {
   margin-left: auto;
   width: 76px;
   height: 54px;
   border-radius: 4px;
+}
+.thumbnail {
+  object-fit: cover;
+  object-position: center;
 }
 .thumb--1 {
   background: radial-gradient(circle at 30% 70%, #3f6b57, #0e1a15 70%);

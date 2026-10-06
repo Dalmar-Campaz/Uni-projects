@@ -10,7 +10,7 @@ const trabajos = [
     n: "01",
     tipo: "taller",
     estado: "completado",
-    titulo: "Taller 1 – Carrusel de personajes",
+    titulo: "Taller 1 - Carrusel de personajes",
     desc: "Variables, condicionales y ciclos para resolver ejercicios básicos de lógica en el navegador.",
     tech: ["JavaScript"],
     numero: "1",
@@ -29,7 +29,8 @@ const ICONO_PAGINA =
 
 /* ---------- Tarjetas ---------- */
 const grid = document.getElementById("grid");
-      // <div class="thumb thumb--${(1 % 4) + 1}" aria-hidden="true"></div>
+
+  // <div class="thumb thumb--${(1 % 4) + 1}" aria-hidden="true"></div>
 function crearTarjeta(t, i) {
   const el = document.createElement("article");
   el.className = "card";
@@ -39,7 +40,7 @@ function crearTarjeta(t, i) {
     <div class="card-top">
       <span class="num">${t.n}</span>
       <span class="status status--${t.estado}">${ETIQUETA[t.estado]}</span>
-      <img src="/miniaturas/T${t.numero}-thumbnail.png" alt="Miniatura del taller ${t.numero}" />
+      <img class="thumbnail" src="/portafolio/miniaturas/T${t.numero}-thumbnail.png" alt="Miniatura del taller ${t.numero}" />
 
     </div>
     <h3>${t.titulo}</h3>
@@ -49,6 +50,17 @@ function crearTarjeta(t, i) {
       <a href="${GITHUB_CODIGO}${t.numero}" target="_blank" rel="noopener noreferrer">${ICONO_CODIGO}Ver código</a>
       <a href="${GITHUB_PAGINA}${t.numero}/index.html" target="_blank" rel="noopener noreferrer">${ICONO_PAGINA}Ver página</a>
     </div>`;
+  const thumbnail = el.querySelector(".thumbnail");
+  thumbnail.addEventListener(
+    "error",
+    () => {
+      const fallback = document.createElement("div");
+      fallback.className = `thumb thumb--${(i % 4) + 1}`;
+      fallback.setAttribute("aria-hidden", "true");
+      thumbnail.replaceWith(fallback);
+    },
+    { once: true },
+  );
   return el;
 }
 trabajos.forEach((t, i) => grid.appendChild(crearTarjeta(t, i)));

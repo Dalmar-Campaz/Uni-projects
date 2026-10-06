@@ -134,11 +134,17 @@ svg {
 .nav-link.is-active {
   background: var(--side-active);
 }
-.quote-side {
+.quote-side,
+.credits {
   margin-top: auto;
   font: italic 400 14px/1.5 var(--serif);
   opacity: 0.75;
   padding: 0 4px;
+}
+.credits {
+  text-align: center;
+  font-size: 0.7rem;
+  margin: -20px 0 0;
 }
 
 /* ---------- Principal ---------- */
@@ -299,7 +305,8 @@ h2 {
   background: var(--pen-bg);
   color: var(--pen-tx);
 }
-.thumb, .thumbnail {
+.thumb,
+.thumbnail {
   margin-left: auto;
   width: 76px;
   height: 54px;
@@ -497,11 +504,23 @@ h2 {
     grid-column: 1 / -1;
     margin-top: 0;
   }
+  .credits {
+    margin-top: 0;
+    grid-column: span 2;
+  }
 }
 @media (max-width: 760px) {
+  .panel-top {
+    justify-content: end;
+    grid-column: 2;
+  }
+  .quote-panel {
+    display: none;
+  }
   .app {
     grid-template-columns: 1fr;
   }
+
   .sidebar {
     position: static;
     height: auto;
@@ -528,6 +547,7 @@ h2 {
     grid-column: 1;
     grid-template-columns: 1fr;
   }
+
   .main {
     padding: 18px;
   }

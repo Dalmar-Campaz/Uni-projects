@@ -143,8 +143,7 @@ svg {
 }
 .credits {
   text-align: center;
-  font-size: 0.7rem;
-  margin: -20px 0 0;
+  font-size: 0.6rem;
 }
 
 /* ---------- Principal ---------- */
@@ -467,6 +466,26 @@ h2 {
 .tech {
   display: grid;
   gap: 14px;
+  overflow-y: scroll;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  max-height: 180px;
+}
+.tech::-webkit-scrollbar {
+  width: 6px;
+}
+.tech:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent; 
+}
+
+.tech:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.tech::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5);
 }
 .tech li {
   display: flex;

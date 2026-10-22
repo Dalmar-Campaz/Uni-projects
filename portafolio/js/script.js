@@ -31,8 +31,8 @@ function crearTarjeta(t, i) {
     <p class="muted">${t.desc}</p>
     <ul class="tags">${t.tech.map((x) => `<li>${x}</li>`).join("")}</ul>
     <div class="card-links">
-      <a href="${t.urlCodigo}${t.numero}" target="_blank" rel="noopener noreferrer">${ICONO_CODIGO}Ver código</a>
-      <a href="${t.urlPagina}${t.numero}/index.html" target="_blank" rel="noopener noreferrer">${ICONO_PAGINA}Ver página</a>
+      <a href="${t.urlCodigo}" target="_blank" rel="noopener noreferrer">${ICONO_CODIGO}Ver código</a>
+      <a href="${t.urlPagina}" target="_blank" rel="noopener noreferrer">${ICONO_PAGINA}Ver página</a>
     </div>`;
   const thumbnail = el.querySelector(".thumbnail");
   thumbnail.addEventListener(

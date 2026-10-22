@@ -1,11 +1,6 @@
 "use strict";
 
 /* ---------- Datos: edita aquí tus talleres ---------- */
-const GITHUB_CODIGO =
-  "https://github.com/Dalmar-Campaz/Uni-projects/tree/main/Programacion IV/Taller ";
-const GITHUB_PAGINA =
-  "https://dalmar-campaz.github.io/Uni-projects/Programacion IV/Taller ";
-
 const ETIQUETA = {
   completado: "Completado",
   proceso: "En proceso",
@@ -36,8 +31,8 @@ function crearTarjeta(t, i) {
     <p class="muted">${t.desc}</p>
     <ul class="tags">${t.tech.map((x) => `<li>${x}</li>`).join("")}</ul>
     <div class="card-links">
-      <a href="${GITHUB_CODIGO}${t.numero}" target="_blank" rel="noopener noreferrer">${ICONO_CODIGO}Ver código</a>
-      <a href="${GITHUB_PAGINA}${t.numero}/index.html" target="_blank" rel="noopener noreferrer">${ICONO_PAGINA}Ver página</a>
+      <a href="${t.urlCodigo}${t.numero}" target="_blank" rel="noopener noreferrer">${ICONO_CODIGO}Ver código</a>
+      <a href="${t.urlPagina}${t.numero}/index.html" target="_blank" rel="noopener noreferrer">${ICONO_PAGINA}Ver página</a>
     </div>`;
   const thumbnail = el.querySelector(".thumbnail");
   thumbnail.addEventListener(

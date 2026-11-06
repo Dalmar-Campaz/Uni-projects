@@ -16,7 +16,7 @@ const trabajos = [
     estado: "proceso",
     titulo: "Proyecto final - Orven real state",
     desc: "...",
-    tech: ["React", "Javascript"],
+    tech: ["React"],
     urlPagina: "https://orven-real-state-website.onrender.com/",
     urlCodigo: "https://github.com/Dalmar-Campaz/Orven---Real-State-website",
     numero: "2",

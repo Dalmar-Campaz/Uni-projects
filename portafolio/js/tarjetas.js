@@ -15,7 +15,7 @@ const trabajos = [
     tipo: "proyecto",
     estado: "proceso",
     titulo: "Proyecto final - Orven real state",
-    desc: "Orven es un proyecto académico de frontend para explorar propiedades y representar un flujo básico de publicación y revisión de inmuebles. Está construido con React, TypeScript y Vite.",
+    desc: "Orven es un proyecto académico de frontend para explorar propiedades y representar un flujo básico de publicación y revisión de inmuebles.",
     tech: ["React", "TypeScript", "CSS"],
     urlPagina: "https://orven-real-state-website.onrender.com/",
     urlCodigo: "https://github.com/Dalmar-Campaz/Orven---Real-State-website",

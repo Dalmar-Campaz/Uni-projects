@@ -3,7 +3,6 @@
  * Este archivo comparte el ámbito clásico con los demás scripts del taller.
  */
 
-     */
     function formatTwoVarGrayLabel(bits, vHigh, vLow) {
       const first = bits[0] === '1' ? vHigh : `${vHigh}'`;
       const second = bits[1] === '1' ? vLow : `${vLow}'`;

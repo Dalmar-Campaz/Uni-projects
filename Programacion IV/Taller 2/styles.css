@@ -32,3 +32,7 @@ body {
     .kmap-cell:active {
       transform: scale(0.95);
     }
+    /* Estilos para interactividad de compuertas en el esquema SVG */
+    .schematic-gate-group {
+      transition: filter 0.15s ease, opacity 0.15s ease;
+    }

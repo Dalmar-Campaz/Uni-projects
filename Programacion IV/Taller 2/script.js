@@ -1,4 +1,4 @@
-/**
+ /**
      * ============================================================================
      * CONFIGURACIÓN Y ESTADO GLOBAL DEL MAPA DE KARNAUGH 4x4 (DCBA)
      * ============================================================================
@@ -300,13 +300,27 @@
 
     /**
      * Selecciona el subconjunto mínimo de implicantes primos que cubre todos los minterms requeridos (1s)
-     * utilizando implicantes primos esenciales + Método de Petrick exacto para los restantes.
+     * utilizando implicantes primos esenciales + dominancia de filas + Método de Petrick exacto
+     * + verificación final de redundancia.
      */
     function selectMinimumCover(primeImplicants, requiredMinterms) {
       if (requiredMinterms.length === 0) return [];
 
+      const requiredSet = new Set(requiredMinterms);
       const remainingMinterms = new Set(requiredMinterms);
       const selectedIndices = new Set();
+
+      // Filtrar implicantes primos que cubran al menos un minterm requerido ('1')
+      // y precalcular su conjunto de minterms requeridos ('1') cubiertos
+      const candidatePIs = primeImplicants
+        .map(pi => {
+          const coveredOnes = pi.minterms.filter(m => requiredSet.has(m));
+          return {
+            ...pi,
+            coveredOnes
+          };
+        })
+        .filter(pi => pi.coveredOnes.length > 0);
 
       // 1. Extraer Implicantes Primos Esenciales de forma iterativa
       let addedEssential = true;
@@ -315,8 +329,8 @@
 
         for (const m of Array.from(remainingMinterms)) {
           const covering = [];
-          primeImplicants.forEach((pi, idx) => {
-            if (!selectedIndices.has(idx) && pi.minterms.includes(m)) {
+          candidatePIs.forEach((pi, idx) => {
+            if (!selectedIndices.has(idx) && pi.coveredOnes.includes(m)) {
               covering.push(idx);
             }
           });
@@ -324,7 +338,7 @@
           if (covering.length === 1) {
             const essentialIdx = covering[0];
             selectedIndices.add(essentialIdx);
-            primeImplicants[essentialIdx].minterms.forEach(coveredM => {
+            candidatePIs[essentialIdx].coveredOnes.forEach(coveredM => {
               remainingMinterms.delete(coveredM);
             });
             addedEssential = true;
@@ -332,22 +346,55 @@
         }
       }
 
-      // 2. Si aún quedan minterms por cubrir (cobertura cíclica), aplicar Método de Petrick
+      // 2. Si aún quedan minterms por cubrir, aplicar Dominancia de Filas + Método de Petrick completo
       if (remainingMinterms.size > 0) {
         const remList = Array.from(remainingMinterms);
-        // Cada minterm pendiente produce una suma de índices de implicantes primos: (P_i + P_j + ...)
+
+        // Obtener índices candidatos que aún cubren al menos un minterm pendiente
+        let activeIndices = [];
+        candidatePIs.forEach((pi, idx) => {
+          if (!selectedIndices.has(idx)) {
+            const remCovered = pi.coveredOnes.filter(m => remainingMinterms.has(m));
+            if (remCovered.length > 0) {
+              activeIndices.push(idx);
+            }
+          }
+        });
+
+        // Dominancia de filas: si el implicante A cubre un subconjunto propio (o igual con >= literales)
+        // de los minterms pendientes que cubre B, y B tiene <= literales que A, A es dominado y se descarta.
+        activeIndices = activeIndices.filter(idxA => {
+          const covA = candidatePIs[idxA].coveredOnes.filter(m => remainingMinterms.has(m));
+          const litA = countLiteralsInPattern(candidatePIs[idxA].pattern);
+
+          for (const idxB of activeIndices) {
+            if (idxA === idxB) continue;
+            const covB = candidatePIs[idxB].coveredOnes.filter(m => remainingMinterms.has(m));
+            const litB = countLiteralsInPattern(candidatePIs[idxB].pattern);
+
+            const aSubsetOfB = covA.every(m => covB.includes(m));
+            if (aSubsetOfB && litB <= litA) {
+              if (covA.length < covB.length || litB < litA || idxB < idxA) {
+                return false;
+              }
+            }
+          }
+          return true;
+        });
+
+        // Construir cláusulas POS para cada minterm restante: (P_i + P_j + ...)
         const clauses = remList.map(m => {
           const opts = [];
-          primeImplicants.forEach((pi, idx) => {
-            if (!selectedIndices.has(idx) && pi.minterms.includes(m)) {
+          activeIndices.forEach(idx => {
+            if (candidatePIs[idx].coveredOnes.includes(m)) {
               opts.push(new Set([idx]));
             }
           });
           return opts;
         });
 
-        // Multiplicar las cláusulas (Producto de Sumas -> Suma de Productos)
-        let product = clauses[0];
+        // Multiplicar las cláusulas aplicando absorción booleana X + XY = X en cada paso
+        let product = simplifyPetrickTerms(clauses[0]);
         for (let i = 1; i < clauses.length; i++) {
           const nextProduct = [];
           for (const termA of product) {
@@ -356,15 +403,14 @@
               nextProduct.push(combined);
             }
           }
-          // Simplificar absorción: si X es subconjunto de Y, eliminar Y
           product = simplifyPetrickTerms(nextProduct);
         }
 
-        // Elegir el término con menor número de implicantes, y en caso de empate, menor cantidad de literales
+        // Elegir el producto con menor cantidad de términos y menor total de literales
         product.sort((setA, setB) => {
           if (setA.size !== setB.size) return setA.size - setB.size;
-          const litA = countLiteralsInSet(setA, primeImplicants);
-          const litB = countLiteralsInSet(setB, primeImplicants);
+          const litA = countLiteralsInSet(setA, candidatePIs);
+          const litB = countLiteralsInSet(setB, candidatePIs);
           return litA - litB;
         });
 
@@ -373,21 +419,54 @@
         }
       }
 
-      // Ordenar los implicantes seleccionados de mayor tamaño de grupo (más '-') a menor
-      const result = Array.from(selectedIndices).map(idx => primeImplicants[idx]);
+      // 3. Paso final de verificación de redundancia:
+      // Eliminar cualquier implicante seleccionado cuyos minterms (1s) ya estén 100% cubiertos
+      // por la unión de los demás implicantes seleccionados.
+      const finalIndices = Array.from(selectedIndices);
+      // Ordenar de menor a mayor tamaño de grupo para evaluar primero si los más pequeños son redundantes
+      finalIndices.sort((a, b) => candidatePIs[a].minterms.length - candidatePIs[b].minterms.length);
+
+      const keptIndices = new Set(finalIndices);
+      for (const idx of finalIndices) {
+        const coveredByOthers = new Set();
+        keptIndices.forEach(otherIdx => {
+          if (otherIdx !== idx) {
+            candidatePIs[otherIdx].coveredOnes.forEach(m => coveredByOthers.add(m));
+          }
+        });
+
+        const isRedundant = candidatePIs[idx].coveredOnes.every(m => coveredByOthers.has(m));
+        if (isRedundant) {
+          keptIndices.delete(idx);
+        }
+      }
+
+      // Ordenar los implicantes finales de mayor tamaño de grupo a menor
+      const result = Array.from(keptIndices).map(idx => ({
+        pattern: candidatePIs[idx].pattern,
+        minterms: candidatePIs[idx].minterms
+      }));
       result.sort((a, b) => b.minterms.length - a.minterms.length);
       return result;
     }
 
+    function countLiteralsInPattern(pattern) {
+      let literals = 0;
+      for (const ch of pattern) {
+        if (ch !== '-') literals++;
+      }
+      return literals;
+    }
+
     function simplifyPetrickTerms(terms) {
-      // Eliminar duplicados y superconjuntos (X + XY = X)
+      // Eliminar duplicados y superconjuntos (Absorción booleana: X + XY = X)
       const unique = [];
       for (let i = 0; i < terms.length; i++) {
         let isSuperset = false;
         for (let j = 0; j < terms.length; j++) {
           if (i === j) continue;
           if (isSubsetOf(terms[j], terms[i])) {
-            // Si son iguales, conservar solo el de menor índice i < j
+            // Si son idénticos, conservar solo el de menor índice j < i
             if (terms[j].size < terms[i].size || j < i) {
               isSuperset = true;
               break;
@@ -410,10 +489,7 @@
     function countLiteralsInSet(indexSet, primeImplicants) {
       let literals = 0;
       indexSet.forEach(idx => {
-        const pat = primeImplicants[idx].pattern;
-        for (const ch of pat) {
-          if (ch !== '-') literals++;
-        }
+        literals += countLiteralsInPattern(primeImplicants[idx].pattern);
       });
       return literals;
     }

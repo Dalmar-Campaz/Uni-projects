@@ -43,6 +43,3 @@
     let currentSpecial = null;   // '0', '1', o null
     let hoveredGroupIndex = null;
     let notGateMode = 'bus';     // 'bus' (compuertas NOT en el bus izquierdo) o 'inline' (burbuja/NOT junto a cada entrada)
-
-    /**
-     * Genera la etiqueta de 2 variables para un par de bits Gray ('00', '01', '11', '10')

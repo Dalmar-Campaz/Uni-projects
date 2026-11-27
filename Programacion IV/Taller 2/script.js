@@ -1,16 +1,20 @@
-/**
+    /**
      * ============================================================================
-     * CONFIGURACIÓN Y ESTADO GLOBAL DEL MAPA DE KARNAUGH 4x4 (DCBA)
+     * CONFIGURACIÓN Y ESTADO GLOBAL DEL MAPA DE KARNAUGH 4x4
      * ============================================================================
      */
 
-    // Orden de código Gray de 2 bits para filas (DC) y columnas (BA)
+    // Orden de código Gray de 2 bits para filas [V3, V2] y columnas [V1, V0]
     const GRAY_CODES = [
-      { bits: '00', val: 0, label: "D'C'" },
-      { bits: '01', val: 1, label: "D'C" },
-      { bits: '11', val: 3, label: 'DC' },
-      { bits: '10', val: 2, label: "DC'" }
+      { bits: '00', val: 0 },
+      { bits: '01', val: 1 },
+      { bits: '11', val: 3 },
+      { bits: '10', val: 2 }
     ];
+
+    // Variables activas en orden [Bit 3 (MSB fila), Bit 2 (LSB fila), Bit 1 (MSB col), Bit 0 (LSB col)]
+    let varNames = ['D', 'C', 'B', 'A'];
+    let activePreset = 'DCBA';
 
     // Paleta de colores distintivos para resaltar cada grupo en el mapa y en la lista
     const GROUP_PALETTE = [
@@ -36,6 +40,126 @@
     let notGateMode = 'bus';     // 'bus' (compuertas NOT en el bus izquierdo) o 'inline' (burbuja/NOT junto a cada entrada)
 
     /**
+     * Genera la etiqueta de 2 variables para un par de bits Gray ('00', '01', '11', '10')
+     */
+    function formatTwoVarGrayLabel(bits, vHigh, vLow) {
+      const first = bits[0] === '1' ? vHigh : `${vHigh}'`;
+      const second = bits[1] === '1' ? vLow : `${vLow}'`;
+      return `${first}${second}`;
+    }
+
+    /**
+     * Actualiza todas las etiquetas de ejes, encabezados, inputs y firmas de función
+     * según el arreglo actual `varNames = [V3, V2, V1, V0]`
+     */
+    function syncVariableLabelsUI() {
+      const [v3, v2, v1, v0] = varNames;
+      const joined = varNames.join('');
+      const reversedJoined = [...varNames].reverse().join('');
+      const rowPair = `${v3}${v2}`;
+      const colPair = `${v1}${v0}`;
+      const sig = `F(${v3},${v2},${v1},${v0})`;
+
+      // Encabezado principal y subtítulos
+      document.getElementById('header-vars-order').textContent = joined;
+      document.getElementById('header-msb-var').textContent = v3;
+      document.getElementById('header-lsb-var').textContent = v0;
+      document.getElementById('subtitle-row-vars').textContent = rowPair;
+      document.getElementById('subtitle-col-vars').textContent = colPair;
+
+      // Botón rápido de inversión
+      document.getElementById('reverse-vars-label').textContent = `${joined} ⇄ ${reversedJoined}`;
+
+      // Esquina diagonal y encabezados de columnas BA / CD / etc.
+      document.getElementById('corner-row-label').textContent = rowPair;
+      document.getElementById('corner-col-label').textContent = colPair;
+      GRAY_CODES.forEach((gc, idx) => {
+        const colHdr = document.getElementById(`col-hdr-${idx}`);
+        if (colHdr) {
+          colHdr.textContent = formatTwoVarGrayLabel(gc.bits, v1, v0);
+        }
+      });
+
+      // Sincronizar valores de los 4 inputs individuales
+      varNames.forEach((letter, idx) => {
+        const inp = document.getElementById(`var-input-${idx}`);
+        if (inp && inp.value !== letter) {
+          inp.value = letter;
+        }
+      });
+
+      // Actualizar estado visual de los botones preset
+      document.querySelectorAll('.var-preset-btn').forEach(btn => {
+        const preset = btn.dataset.preset;
+        if (preset === activePreset) {
+          btn.className = 'var-preset-btn px-2.5 py-1 rounded-lg font-mono-code text-xs font-bold bg-indigo-600 text-white shadow-xs transition cursor-pointer';
+        } else {
+          btn.className = 'var-preset-btn px-2.5 py-1 rounded-lg font-mono-code text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition cursor-pointer';
+        }
+      });
+
+      // Firma de la función booleana, esquema y fórmula del pie de página
+      document.getElementById('function-signature').textContent = `${sig} =`;
+      document.getElementById('schematic-func-sig').textContent = sig;
+      document.getElementById('footer-minterm-formula').textContent = `Minterm = 8·${v3} + 4·${v2} + 2·${v1} + 1·${v0}`;
+    }
+
+    /**
+     * Aplica un nuevo arreglo de 4 letras únicas y re-renderiza todo el sistema
+     */
+    function applyVariableNames(newVars, presetName = null) {
+      varNames = [...newVars];
+      const joined = varNames.join('');
+      if (presetName) {
+        activePreset = presetName;
+      } else if (['DCBA', 'ABCD', 'WXYZ'].includes(joined)) {
+        activePreset = joined;
+      } else {
+        activePreset = 'CUSTOM';
+      }
+
+      syncVariableLabelsUI();
+      buildKMapGrid();
+      updateMintermsSummary();
+      solveAndRender();
+    }
+
+    /**
+     * Maneja la edición en tiempo real de cualquiera de las 4 letras individuales
+     * garantizando letras alfabéticas únicas en mayúscula.
+     */
+    function handleCustomLetterInput(index, rawValue) {
+      const msgEl = document.getElementById('var-validation-msg');
+      const cleaned = rawValue.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 1);
+      const inputEl = document.getElementById(`var-input-${index}`);
+
+      if (!cleaned) {
+        // Restaurar la letra anterior si se borra o se escribe un carácter no alfabético
+        inputEl.value = varNames[index];
+        return;
+      }
+
+      const nextVars = [...varNames];
+      const duplicateIdx = nextVars.findIndex((v, i) => i !== index && v === cleaned);
+
+      if (duplicateIdx !== -1) {
+        // Si la letra ya estaba en otra posición, intercambiarlas automáticamente para mantener unicidad
+        const previousLetter = nextVars[index];
+        nextVars[duplicateIdx] = previousLetter;
+        nextVars[index] = cleaned;
+        msgEl.textContent = `Se intercambiaron "${cleaned}" y "${previousLetter}" para evitar variables duplicadas.`;
+        msgEl.classList.remove('hidden');
+        clearTimeout(msgEl._hideTimer);
+        msgEl._hideTimer = setTimeout(() => msgEl.classList.add('hidden'), 2600);
+      } else {
+        nextVars[index] = cleaned;
+        msgEl.classList.add('hidden');
+      }
+
+      applyVariableNames(nextVars);
+    }
+
+    /**
      * ============================================================================
      * CONSTRUCCIÓN DE LA INTERFAZ DEL MAPA 4x4
      * ============================================================================
@@ -43,24 +167,26 @@
     function buildKMapGrid() {
       const container = document.getElementById('kmap-grid-body');
       container.innerHTML = '';
+      const [v3, v2] = varNames;
 
       for (let r = 0; r < 4; r++) {
-        const dcInfo = GRAY_CODES[r];
+        const rowInfo = GRAY_CODES[r];
+        const rowExprLabel = formatTwoVarGrayLabel(rowInfo.bits, v3, v2);
 
-        // Encabezado de fila (DC)
+        // Encabezado de fila [V3 V2]
         const rowHeader = document.createElement('div');
         rowHeader.className = 'aspect-square rounded-xl bg-slate-100/80 border border-slate-200/80 flex flex-col items-center justify-center select-none';
         rowHeader.innerHTML = `
-          <span class="font-mono-code text-sm sm:text-base font-bold text-slate-800">${dcInfo.bits}</span>
-          <span class="text-[10px] text-slate-400 font-mono-code">${dcInfo.label}</span>
+          <span class="font-mono-code text-sm sm:text-base font-bold text-slate-800">${rowInfo.bits}</span>
+          <span class="text-[10px] text-slate-400 font-mono-code">${rowExprLabel}</span>
         `;
         container.appendChild(rowHeader);
 
-        // 4 celdas de la fila (BA)
+        // 4 celdas de la fila [V1 V0]
         for (let c = 0; c < 4; c++) {
-          const baInfo = GRAY_CODES[c];
-          // Minterm decimal: D*8 + C*4 + B*2 + A*1
-          const minterm = (dcInfo.val << 2) | baInfo.val;
+          const colInfo = GRAY_CODES[c];
+          // Minterm decimal: V3*8 + V2*4 + V1*2 + V0*1
+          const minterm = (rowInfo.val << 2) | colInfo.val;
           const binaryStr = minterm.toString(2).padStart(4, '0');
 
           const cellBtn = document.createElement('button');
@@ -503,10 +629,10 @@
 
     /**
      * Convierte un patrón de 4 bits (ej. "01-0") a texto plano o HTML según estilo
-     * Posición 0 -> D, Posición 1 -> C, Posición 2 -> B, Posición 3 -> A
+     * Posición 0 -> varNames[0], Posición 1 -> varNames[1], Posición 2 -> varNames[2], Posición 3 -> varNames[3]
      */
     function formatPattern(pattern, style = 'prime', asHtml = false) {
-      const vars = ['D', 'C', 'B', 'A'];
+      const vars = varNames;
       let out = '';
 
       for (let i = 0; i < 4; i++) {
@@ -744,7 +870,7 @@
       const wrapper = document.getElementById('schematic-wrapper');
       if (!wrapper) return;
 
-      const VARS = ['D', 'C', 'B', 'A'];
+      const VARS = varNames;
 
       // Helper para crear elementos SVG con atributos limpios
       const el = (tag, attrs = {}) => {
@@ -1290,7 +1416,7 @@
 
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'esquema_karnaugh_DCBA.svg';
+      link.download = `esquema_karnaugh_${varNames.join('')}.svg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -1327,7 +1453,7 @@
           const pngUrl = URL.createObjectURL(pngBlob);
           const link = document.createElement('a');
           link.href = pngUrl;
-          link.download = 'esquema_karnaugh_DCBA.png';
+          link.download = `esquema_karnaugh_${varNames.join('')}.png`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1377,7 +1503,7 @@
     }
 
     function copyExpressionToClipboard() {
-      let plainText = 'F(D,C,B,A) = ';
+      let plainText = `F(${varNames.join(',')}) = `;
       if (currentSpecial === '0') {
         plainText += '0';
       } else if (currentSpecial === '1') {
@@ -1411,6 +1537,7 @@
      * Inicialización al cargar la página
      */
     window.addEventListener('DOMContentLoaded', () => {
+      syncVariableLabelsUI();
       buildKMapGrid();
 
       // Cargar un ejemplo inicial ilustrativo (ej. D'C + BA')
@@ -1423,6 +1550,33 @@
 
       updateMintermsSummary();
       solveAndRender();
+
+      // Eventos de presets y personalización de variables
+      document.querySelectorAll('.var-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const preset = btn.dataset.preset;
+          if (preset === 'CUSTOM') {
+            activePreset = 'CUSTOM';
+            syncVariableLabelsUI();
+            const firstInput = document.getElementById('var-input-0');
+            if (firstInput) {
+              firstInput.focus();
+              firstInput.select();
+            }
+          } else {
+            applyVariableNames(preset.split(''), preset);
+          }
+        });
+      });
+
+      document.getElementById('btn-reverse-vars').addEventListener('click', () => {
+        applyVariableNames([...varNames].reverse());
+      });
+
+      document.querySelectorAll('.var-letter-input').forEach((inp, idx) => {
+        inp.addEventListener('focus', () => inp.select());
+        inp.addEventListener('input', e => handleCustomLetterInput(idx, e.target.value));
+      });
 
       // Eventos de botones principales
       document.getElementById('btn-generate').addEventListener('click', solveAndRender);

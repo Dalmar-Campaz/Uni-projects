@@ -24,7 +24,7 @@
             Generador de Expresiones Booleanas
           </h1>
           <p class="text-xs sm:text-sm text-slate-500">
-            Mapa de Karnaugh 4×4 · Orden de bits <span class="font-mono-code font-semibold text-slate-700">DCBA</span> (D = MSB, A = LSB)
+            Mapa de Karnaugh 4×4 · Orden de bits <span id="header-vars-order" class="font-mono-code font-semibold text-slate-700">DCBA</span> (<span id="header-msb-var" class="font-mono-code">D</span> = MSB, <span id="header-lsb-var" class="font-mono-code">A</span> = LSB)
           </p>
         </div>
       </div>
@@ -41,10 +41,10 @@
 
       <!-- Columna Izquierda: Tabla del Mapa de Karnaugh 4x4 -->
       <section class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-3">
           <div>
             <h2 class="text-base font-semibold text-slate-800">Mapa de Karnaugh (4 Variables)</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Filas: <span class="font-mono-code font-medium">DC</span> · Columnas: <span class="font-mono-code font-medium">BA</span></p>
+            <p class="text-xs text-slate-500 mt-0.5">Filas: <span id="subtitle-row-vars" class="font-mono-code font-medium text-slate-700">DC</span> · Columnas: <span id="subtitle-col-vars" class="font-mono-code font-medium text-slate-700">BA</span></p>
           </div>
           <!-- Leyenda rápida de estados -->
           <div class="flex items-center gap-2 text-xs">
@@ -54,32 +54,90 @@
           </div>
         </div>
 
+        <!-- Panel de Configuración de Variables (Presets, Inversión rápida y Personalizado) -->
+        <div class="mb-4 p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col gap-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 flex-wrap" role="group" aria-label="Presets de variables">
+              <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mr-1">Variables:</span>
+              <button type="button" data-preset="DCBA" class="var-preset-btn px-2.5 py-1 rounded-lg font-mono-code text-xs font-bold bg-indigo-600 text-white shadow-xs transition cursor-pointer">
+                DCBA
+              </button>
+              <button type="button" data-preset="ABCD" class="var-preset-btn px-2.5 py-1 rounded-lg font-mono-code text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition cursor-pointer">
+                ABCD
+              </button>
+              <button type="button" data-preset="WXYZ" class="var-preset-btn px-2.5 py-1 rounded-lg font-mono-code text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition cursor-pointer">
+                WXYZ
+              </button>
+              <button type="button" id="btn-preset-custom" data-preset="CUSTOM" class="var-preset-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition cursor-pointer">
+                Personalizado
+              </button>
+            </div>
+
+            <!-- Botón rápido para invertir el orden MSB <-> LSB -->
+            <button
+              id="btn-reverse-vars"
+              type="button"
+              class="px-2.5 py-1 rounded-lg bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono-code text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+              title="Invertir orden de bits (MSB ↔ LSB)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="17 1 21 5 17 9"></polyline>
+                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                <polyline points="7 23 3 19 7 15"></polyline>
+                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+              </svg>
+              <span id="reverse-vars-label">DCBA ⇄ ABCD</span>
+            </button>
+          </div>
+
+          <!-- Campos individuales para editar las 4 letras (Bit 3 MSB -> Bit 0 LSB) -->
+          <div id="custom-vars-bar" class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-200/70">
+            <label class="flex flex-col items-center bg-white rounded-lg border border-slate-200 p-1.5 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20">
+              <span class="text-[10px] font-medium text-slate-400">Bit 3 (MSB Fila)</span>
+              <input id="var-input-0" type="text" maxlength="1" value="D" aria-label="Variable Bit 3 MSB fila" class="var-letter-input w-full text-center font-mono-code font-bold text-sm text-slate-800 uppercase focus:outline-none bg-transparent mt-0.5" />
+            </label>
+            <label class="flex flex-col items-center bg-white rounded-lg border border-slate-200 p-1.5 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20">
+              <span class="text-[10px] font-medium text-slate-400">Bit 2 (LSB Fila)</span>
+              <input id="var-input-1" type="text" maxlength="1" value="C" aria-label="Variable Bit 2 LSB fila" class="var-letter-input w-full text-center font-mono-code font-bold text-sm text-slate-800 uppercase focus:outline-none bg-transparent mt-0.5" />
+            </label>
+            <label class="flex flex-col items-center bg-white rounded-lg border border-slate-200 p-1.5 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20">
+              <span class="text-[10px] font-medium text-slate-400">Bit 1 (MSB Col)</span>
+              <input id="var-input-2" type="text" maxlength="1" value="B" aria-label="Variable Bit 1 MSB columna" class="var-letter-input w-full text-center font-mono-code font-bold text-sm text-slate-800 uppercase focus:outline-none bg-transparent mt-0.5" />
+            </label>
+            <label class="flex flex-col items-center bg-white rounded-lg border border-slate-200 p-1.5 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20">
+              <span class="text-[10px] font-medium text-slate-400">Bit 0 (LSB Col)</span>
+              <input id="var-input-3" type="text" maxlength="1" value="A" aria-label="Variable Bit 0 LSB columna" class="var-letter-input w-full text-center font-mono-code font-bold text-sm text-slate-800 uppercase focus:outline-none bg-transparent mt-0.5" />
+            </label>
+          </div>
+          <p id="var-validation-msg" class="hidden text-[11px] text-amber-700 font-medium"></p>
+        </div>
+
         <!-- Contenedor centrado y responsivo de la matriz K-Map -->
         <div class="w-full flex justify-center my-2">
           <div class="w-full max-w-[430px]">
             <div class="grid grid-cols-5 gap-1.5 sm:gap-2 items-stretch">
               <!-- Esquina superior izquierda diagonal DC \ BA -->
               <div class="diagonal-header relative aspect-square rounded-xl border border-slate-200 bg-slate-50 flex flex-col justify-between p-1.5 sm:p-2 select-none">
-                <span class="self-end font-mono-code text-[11px] sm:text-xs font-bold text-indigo-600 tracking-wider">BA</span>
-                <span class="self-start font-mono-code text-[11px] sm:text-xs font-bold text-slate-700 tracking-wider">DC</span>
+                <span id="corner-col-label" class="self-end font-mono-code text-[11px] sm:text-xs font-bold text-indigo-600 tracking-wider">BA</span>
+                <span id="corner-row-label" class="self-start font-mono-code text-[11px] sm:text-xs font-bold text-slate-700 tracking-wider">DC</span>
               </div>
 
-              <!-- Encabezados de columnas BA en Código Gray -->
+              <!-- Encabezados de columnas en Código Gray (dinámicos) -->
               <div class="aspect-square rounded-xl bg-slate-100/80 border border-slate-200/80 flex flex-col items-center justify-center">
                 <span class="font-mono-code text-sm sm:text-base font-bold text-slate-800">00</span>
-                <span class="text-[10px] text-slate-400 font-mono-code">B'A'</span>
+                <span id="col-hdr-0" class="text-[10px] text-slate-400 font-mono-code">B'A'</span>
               </div>
               <div class="aspect-square rounded-xl bg-slate-100/80 border border-slate-200/80 flex flex-col items-center justify-center">
                 <span class="font-mono-code text-sm sm:text-base font-bold text-slate-800">01</span>
-                <span class="text-[10px] text-slate-400 font-mono-code">B'A</span>
+                <span id="col-hdr-1" class="text-[10px] text-slate-400 font-mono-code">B'A</span>
               </div>
               <div class="aspect-square rounded-xl bg-slate-100/80 border border-slate-200/80 flex flex-col items-center justify-center">
                 <span class="font-mono-code text-sm sm:text-base font-bold text-slate-800">11</span>
-                <span class="text-[10px] text-slate-400 font-mono-code">BA</span>
+                <span id="col-hdr-2" class="text-[10px] text-slate-400 font-mono-code">BA</span>
               </div>
               <div class="aspect-square rounded-xl bg-slate-100/80 border border-slate-200/80 flex flex-col items-center justify-center">
                 <span class="font-mono-code text-sm sm:text-base font-bold text-slate-800">10</span>
-                <span class="text-[10px] text-slate-400 font-mono-code">BA'</span>
+                <span id="col-hdr-3" class="text-[10px] text-slate-400 font-mono-code">BA'</span>
               </div>
 
               <!-- Filas generadas dinámicamente por JS -->
@@ -177,7 +235,7 @@
           <!-- Caja visual de la ecuación -->
           <div class="rounded-xl bg-slate-50 border border-slate-200/90 p-4 sm:p-5 min-h-[84px] flex items-center justify-between overflow-x-auto">
             <div class="font-mono-code text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 tracking-tight whitespace-nowrap">
-              <span class="text-slate-400 font-normal text-lg sm:text-xl mr-2">F(D,C,B,A) =</span>
+              <span id="function-signature" class="text-slate-400 font-normal text-lg sm:text-xl mr-2">F(D,C,B,A) =</span>
               <span id="expression-output">0</span>
             </div>
           </div>
@@ -228,7 +286,7 @@
             </span>
           </div>
           <p class="text-xs text-slate-500 mt-0.5">
-            Circuito lógico generado automáticamente a partir de <span class="font-mono-code font-medium text-slate-700">F(D,C,B,A)</span> con buses ortogonales, nodos de conexión y puentes de cruce
+            Circuito lógico generado automáticamente a partir de <span id="schematic-func-sig" class="font-mono-code font-medium text-slate-700">F(D,C,B,A)</span> con buses ortogonales, nodos de conexión y puentes de cruce
           </p>
         </div>
 
@@ -284,7 +342,7 @@
   <footer class="border-t border-slate-200 bg-white mt-8">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
       <span>Algoritmo de Quine-McCluskey + Cobertura Mínima de Petrick</span>
-      <span class="font-mono-code">Minterm = 8·D + 4·C + 2·B + 1·A</span>
+      <span id="footer-minterm-formula" class="font-mono-code">Minterm = 8·D + 4·C + 2·B + 1·A</span>
     </div>
   </footer>
 

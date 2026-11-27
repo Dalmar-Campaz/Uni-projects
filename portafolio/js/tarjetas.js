@@ -20,5 +20,16 @@ const trabajos = [
     urlPagina: "https://orven-real-state-website.onrender.com/",
     urlCodigo: "https://github.com/Dalmar-Campaz/Orven---Real-State-website",
     numero: "2",
+  },
+  {
+    n: "02",
+    tipo: "proyecto",
+    estado: "completado",
+    titulo: "Generador de expresion booleana",
+    desc: "Esta pagina genera expresiones booleanas a partir de mapas de karnough",
+    tech: ["CSS", "Javascript"],
+    urlPagina: "https://dalmar-campaz.github.io/Uni-projects/Programacion%20IV/Taller%202/index.html",
+    urlCodigo: "https://github.com/Dalmar-Campaz/Uni-projects/tree/main/Programacion%20IV/Taller%202",
+    numero: "3",
   }
 ];
